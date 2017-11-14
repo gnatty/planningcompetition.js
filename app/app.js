@@ -40,3 +40,7 @@ renderApp.rounds.forEach((round) => {
   // -- PUSH VIEW.
   showPlanning.innerHTML = showPlanning.innerHTML + rr;
 });
+
+let winnerTeam = renderApp.rounds[renderApp.rounds.length-1].matchs[0].winnerTeam.name;
+let rr = '<div class="container"><div class="notification"><h1 class="title">Gagnant de la compétation :  ' + winnerTeam + '</h1></div>';
+showPlanning.innerHTML = showPlanning.innerHTML + rr;

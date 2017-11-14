@@ -6370,6 +6370,10 @@ renderApp.rounds.forEach(function (round) {
   showPlanning.innerHTML = showPlanning.innerHTML + rr;
 });
 
+var winnerTeam = renderApp.rounds[renderApp.rounds.length - 1].matchs[0].winnerTeam.name;
+var rr = '<div class="container"><div class="notification"><h1 class="title">Gagnant de la compétation :  ' + winnerTeam + '</h1></div>';
+showPlanning.innerHTML = showPlanning.innerHTML + rr;
+
 },{"./classes/Render":7}],5:[function(require,module,exports){
 "use strict";
 

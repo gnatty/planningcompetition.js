@@ -15,3 +15,7 @@ export const getRandomInt = function _getRandomInt(min, max) {
   max = Math.floor(max) + 1;
   return Math.floor(Math.random() * (max - min)) + min;
 }
+
+export const replaceVarFromStr = function _replaceVarFromStr(str, search, replace) {
+  return str.replace('{{' + search + '}}', replace);
+}

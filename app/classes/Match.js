@@ -10,6 +10,8 @@ export default class Match {
     this._looserTeam = null;
     this._winnerTeam = null;
     this._result = null;
+    // --- THROW MATCH.
+    this._getMatchResult();
   }
 
   get id() {
@@ -64,10 +66,6 @@ export default class Match {
     this._result = newResult;
   }
 
-  /***
-  * @run
-  * Will run a match and set for a winner//looser//null
-  */
   run() {
     this._getMatchResult();
     console.log(this.id + ' --- ' + this.result);
@@ -82,7 +80,8 @@ export default class Match {
   * @return {number}
   */
   _getMatchResult() {
-    let rdnKey = getRandomInt(0, 2);
+    // Set to 0, 2 for null match.
+    let rdnKey = getRandomInt(1, 2);
     switch(rdnKey) {
     case 0:
       this.result = 'null';

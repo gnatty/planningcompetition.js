@@ -6339,18 +6339,38 @@ module.exports=[
 },{}],4:[function(require,module,exports){
 'use strict';
 
-var _Run = require('./classes/Run');
+var _Render = require('./classes/Render');
 
-var _Run2 = _interopRequireDefault(_Run);
+var _Render2 = _interopRequireDefault(_Render);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-console.log('running app.js');
+var renderApp = new _Render2.default('My Digital School', 10, 32);
+renderApp.init();
 
-var appRun = new _Run2.default();
-appRun.run();
+var showPlanning = document.querySelector('#showPlanning');
+renderApp.rounds.splice(-1, 1);
 
-},{"./classes/Run":9}],5:[function(require,module,exports){
+renderApp.rounds.forEach(function (round) {
+  var rr = '<div class="container"><div class="notification"><h1 class="title">Round ' + round.id + '</h1></div>';
+
+  for (var i = 0; i < round.matchs.length; i++) {
+
+    var match = round.matchs[i];
+
+    var team1 = match.winnerTeam;
+    var team2 = match.looserTeam;
+    var mt = '<div class="columns" id="match">' + '<div class="column is-5 teamLeft">' + '<span class="tag is-light is-large"><i class="fa fa-users" aria-hidden="true"></i></span>' + '<span class="tag is-light is-large">' + team1.name + '</span>' + '<span class="tag is-success is-large">Gagnant</span>' + '</div>' + '<div class="column is-2 teamVS">' + '<span class="tag is-dark is-large">VS</span>' + '</div>' + '<div class="column is-5 teamRight">' + '<span class="tag is-light is-large"><i class="fa fa-users" aria-hidden="true"></i></span>' + '<span class="tag is-light is-large">' + team2.name + '</span>' + '<span class="tag is-danger is-large">Perdant</span>' + '</div>' + '</div>';
+
+    rr += mt;
+  }
+
+  rr += '</div>';
+  // -- PUSH VIEW.
+  showPlanning.innerHTML = showPlanning.innerHTML + rr;
+});
+
+},{"./classes/Render":7}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6434,16 +6454,12 @@ var Match = function () {
     this._looserTeam = null;
     this._winnerTeam = null;
     this._result = null;
+    // --- THROW MATCH.
+    this._getMatchResult();
   }
 
   _createClass(Match, [{
     key: 'run',
-
-
-    /***
-    * @run
-    * Will run a match and set for a winner//looser//null
-    */
     value: function run() {
       this._getMatchResult();
       console.log(this.id + ' --- ' + this.result);
@@ -6461,7 +6477,8 @@ var Match = function () {
   }, {
     key: '_getMatchResult',
     value: function _getMatchResult() {
-      var rdnKey = (0, _utils.getRandomInt)(0, 2);
+      // Set to 0, 2 for null match.
+      var rdnKey = (0, _utils.getRandomInt)(1, 2);
       switch (rdnKey) {
         case 0:
           this.result = 'null';
@@ -6539,153 +6556,29 @@ var Match = function () {
 
 exports.default = Match;
 
-},{"./../utils/utils":12}],7:[function(require,module,exports){
+},{"./../utils/utils":11}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // --- IMPORT CLASSES
+
+
+// --- IMPORT UTILS
+
+
+// --- API DATA
+
+
+var _HostCountry = require('./HostCountry');
+
+var _HostCountry2 = _interopRequireDefault(_HostCountry);
 
 var _Round = require('./Round');
 
 var _Round2 = _interopRequireDefault(_Round);
-
-var _Match = require('./Match');
-
-var _Match2 = _interopRequireDefault(_Match);
-
-var _utils = require('./../utils/utils');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var PlanningCompetition = function () {
-  function PlanningCompetition(hostCountry, teams) {
-    _classCallCheck(this, PlanningCompetition);
-
-    this._hostCountry = hostCountry;
-    this._teams = teams;
-  }
-
-  _createClass(PlanningCompetition, [{
-    key: 'run',
-    value: function run() {
-      console.table(this._createRounds());
-    }
-  }, {
-    key: 'initialize',
-    value: function initialize() {}
-  }, {
-    key: '_createRounds',
-    value: function _createRounds() {
-      var rounds = [];
-      var roundId = 1;
-      var teamsLength = this.teams.length;
-      while (teamsLength > 0) {
-        console.log(teamsLength);
-        teamsLength = teamsLength / 2;
-        var matchs = [];
-        for (var i = 1; i <= teamsLength; i++) {
-          matchs.push(new _Match2.default(i, null, null, null));
-        }
-        rounds.push(new _Round2.default(roundId, matchs));
-        roundId++;
-        if (teamsLength === 2) {
-          teamsLength = 0;
-        }
-      }
-      return rounds;
-    }
-  }, {
-    key: '_createMatchs',
-    value: function _createMatchs(tempTeams) {
-      var matchId = 1;
-      var matchList = [];
-      while (tempTeams.length >= 2) {
-        var team1 = (0, _utils.shuffleArray)(tempTeams)[0];
-        tempTeams.splice(0, 1);
-        var team2 = (0, _utils.shuffleArray)(tempTeams)[0];
-        tempTeams.splice(0, 1);
-        matchList.push(new _Match2.default(matchId, team1, team2));
-        matchId++;
-      }
-      return matchList;
-    }
-  }, {
-    key: 'hostCountry',
-    get: function get() {
-      return this._hostCountry;
-    },
-    set: function set(newHostCountry) {
-      this._hostCountry = newHostCountry;
-    }
-  }, {
-    key: 'teams',
-    get: function get() {
-      return this._teams;
-    },
-    set: function set(newTeams) {
-      this._teams = newTeams;
-    }
-  }]);
-
-  return PlanningCompetition;
-}();
-
-exports.default = PlanningCompetition;
-
-},{"./../utils/utils":12,"./Match":6,"./Round":8}],8:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Match = require('./Match');
-
-var _Match2 = _interopRequireDefault(_Match);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Round = function () {
-  function Round(id, teams) {
-    _classCallCheck(this, Round);
-
-    this._id = id;
-    this._teams = teams;
-  }
-
-  _createClass(Round, [{
-    key: 'id',
-    get: function get() {
-      return this._id;
-    }
-  }]);
-
-  return Round;
-}();
-
-exports.default = Round;
-
-},{"./Match":6}],9:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _PlanningCompetition = require('./PlanningCompetition');
-
-var _PlanningCompetition2 = _interopRequireDefault(_PlanningCompetition);
 
 var _Stade = require('./Stade');
 
@@ -6695,13 +6588,11 @@ var _Team = require('./Team');
 
 var _Team2 = _interopRequireDefault(_Team);
 
-var _HostCountry = require('./HostCountry');
-
-var _HostCountry2 = _interopRequireDefault(_HostCountry);
-
 var _Match = require('./Match');
 
 var _Match2 = _interopRequireDefault(_Match);
+
+var _utils = require('./../utils/utils');
 
 var _city = require('./../../api/city');
 
@@ -6715,128 +6606,189 @@ var _country = require('./../../api/country');
 
 var _country2 = _interopRequireDefault(_country);
 
-var _utils = require('./../utils/utils');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Run = function () {
-  function Run() {
-    _classCallCheck(this, Run);
+var Render = function () {
+  function Render(hostCountryName, nbStade, nbTeam) {
+    _classCallCheck(this, Render);
 
-    this._planningCompetition;
+    // --- SETTINGS
+    this.hostCountryName = hostCountryName;
+    this.nbStade = nbStade;
+    this.nbTeam = nbTeam;
+    // --- GLOBAL DATA
+    this._hostCountry = null;
+    this._teams = null;
+    this._rounds = null;
+    this._stades = null;
   }
 
-  _createClass(Run, [{
-    key: 'run',
-    value: function run() {
+  _createClass(Render, [{
+    key: 'init',
+    value: function init() {
+      // Init var.
+      var hostCountry = this.createHostCountry(this.hostCountryName);
+      var teams = this.createTeams(this.nbTeam);
+      var rounds = this.createRounds(this.nbTeam);
+      var stades = this.createStades(this.nbStade);
+      this._hostCountry = hostCountry;
+      this._rounds = rounds;
+      this._stades = stades;
 
-      var pl = this._createPlanningCompetition('turquie', 10, 16)._planningCompetition;
-      pl.run();
-    }
+      // Run it.
+      for (var i = 0; i < rounds.length; i++) {
+        // ---
+        if (i > 0) {
+          teams = [];
+          rounds[i - 1].matchs.forEach(function (match) {
+            teams.push(match.winnerTeam);
+          });
+        }
 
-    /**
-    *
-    * #_createPlanningCompetition(hostCountryName, nbStade, nbTeam)
-    * @param {string} hostCountryName
-    * @param {string} nbStade
-    * @param {string} nbTeam
-    */
-
-  }, {
-    key: '_createPlanningCompetition',
-    value: function _createPlanningCompetition(hostCountryName, nbStade, nbTeam) {
-
-      var _planningCompetition = void 0;
-      var _hostCountry = this._createHostCountry(hostCountryName);
-      var _stades = this._createStade(nbStade);
-      var _teams = this._createTeam(nbTeam);
-      _hostCountry.stades = _stades;
-      _planningCompetition = new _PlanningCompetition2.default(_hostCountry, _teams);
-
-      return {
-        _planningCompetition: _planningCompetition,
-        _hostCountry: _hostCountry,
-        _stades: _stades,
-        _teams: _teams
-      };
-    }
-
-    /**
-    *
-    * #_createHostCountry(hostname)
-    * @param {string} hostname
-    * @return {HostCountry} hostCountry
-    */
-
-  }, {
-    key: '_createHostCountry',
-    value: function _createHostCountry(hostname) {
-      var nameCountry = hostname.toUpperCase();
-      var codeISO = hostname.slice(0, 3).toUpperCase();
-      var _hostCountry = new _HostCountry2.default(
-      // @HostCountry(id, nameCountry, codeISO)
-      1, nameCountry, codeISO);
-      return _hostCountry;
-    }
-
-    /**
-    *
-    * #_createStade(nbStade)
-    * @param {string} nbStade
-    * @return {Stade[]} stades
-    */
-
-  }, {
-    key: '_createStade',
-    value: function _createStade(nbStade) {
-      var _stades = [];
-      for (var i = 1; i <= nbStade; i++) {
-        var curApiData = (0, _utils.getRandomValueFromApi)(_city2.default);
-        _stades.push(new _Stade2.default(
-        // @Stade(id, name, city, nbSeat, available, lastDataUse)
-        i, curApiData.name, curApiData.state, 500, true, new Date()));
+        var matchs = this.setTeamInRound(rounds[i], teams);
+        rounds[i].matchs = matchs;
       }
-      return _stades;
+
+      // Final
+      this._rounds = rounds;
     }
-
-    /**
-    *
-    * #_createTeam(nbTeam)
-    * @param {string} nbTeam
-    * @return {Team[]} teams
-    */
-
   }, {
-    key: '_createTeam',
-    value: function _createTeam(nbTeam) {
-      var _teams = [];
+    key: 'createHostCountry',
+    value: function createHostCountry(hostCountryName) {
+      return new _HostCountry2.default(1, hostCountryName.toUpperCase(), hostCountryName.slice(0, 3).toUpperCase());
+    }
+  }, {
+    key: 'createRounds',
+    value: function createRounds(nbTeam) {
+      var rounds = [];
+      var roundId = 0;
+      while (nbTeam >= 1) {
+        roundId++;
+        // --- PUSH NEW ROUND
+        rounds.push(
+        // @Round(id, nbTeam, matchs)
+        new _Round2.default(roundId, nbTeam, null));
+        // ---
+        nbTeam = nbTeam / 2;
+      }
+      return rounds;
+    }
+  }, {
+    key: 'createStades',
+    value: function createStades(nbStade) {
+      var stades = [];
+      for (var i = 1; i <= nbStade; i++) {
+        stades.push(
+        // @Stade(id, name, city, nbSeat, available, lastDataUse)
+        new _Stade2.default(i, null, null, 500, true, new Date()));
+      }
+      return stades;
+    }
+  }, {
+    key: 'createTeams',
+    value: function createTeams(nbTeam) {
+      var teams = [];
       for (var i = 1; i <= nbTeam; i++) {
         var teamName = (0, _utils.getRandomValueFromApi)(_team2.default);
         var teamCountry = (0, _utils.getRandomValueFromApi)(_country2.default);
-        _teams.push(new _Team2.default(
+        teams.push(
         // @Team(id, name, country, nbPlayer)
-        i, teamName, 11, teamCountry, true));
+        new _Team2.default(i, teamName, teamCountry, 11));
       }
-      return _teams;
+      return teams;
     }
   }, {
-    key: 'planningCompetition',
+    key: 'setTeamInRound',
+    value: function setTeamInRound(round, teams) {
+      if (round.nbTeam === 1) {
+        return null;
+      }
+      var nbSlot = round.nbTeam / 2;
+      var matchs = [];
+      for (var i = 1; i <= nbSlot; i++) {
+
+        // --- PICK'UP VALUES
+        var team1 = (0, _utils.shuffleArray)(teams)[0];
+        teams.splice(0, 1);
+        var team2 = (0, _utils.shuffleArray)(teams)[0];
+        teams.splice(0, 1);
+        // --- PUSH NEW MATCH.
+        matchs.push(
+        // @Match(id, stade, team1, team2)
+        new _Match2.default(i, null, team1, team2));
+      }
+      return matchs;
+    }
+  }, {
+    key: 'teams',
     get: function get() {
-      return this._planningCompetition;
-    },
-    set: function set(newPlanningCompetition) {
-      this._planningCompetition = newPlanningCompetition;
+      return this._teams;
+    }
+  }, {
+    key: 'rounds',
+    get: function get() {
+      return this._rounds;
     }
   }]);
 
-  return Run;
+  return Render;
 }();
 
-exports.default = Run;
+exports.default = Render;
 
-},{"./../../api/city":1,"./../../api/country":2,"./../../api/team":3,"./../utils/utils":12,"./HostCountry":5,"./Match":6,"./PlanningCompetition":7,"./Stade":10,"./Team":11}],10:[function(require,module,exports){
+},{"./../../api/city":1,"./../../api/country":2,"./../../api/team":3,"./../utils/utils":11,"./HostCountry":5,"./Match":6,"./Round":8,"./Stade":9,"./Team":10}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Round = function () {
+  function Round(id, nbTeam, matchs) {
+    _classCallCheck(this, Round);
+
+    this._id = id;
+    this._nbTeam = nbTeam;
+    this._matchs = matchs;
+  }
+
+  _createClass(Round, [{
+    key: "id",
+    get: function get() {
+      return this._id;
+    }
+  }, {
+    key: "nbTeam",
+    get: function get() {
+      return this._nbTeam;
+    }
+  }, {
+    key: "teams",
+    get: function get() {
+      return this._teams;
+    }
+  }, {
+    key: "matchs",
+    get: function get() {
+      return this._matchs;
+    },
+    set: function set(newMatchs) {
+      this._matchs = newMatchs;
+    }
+  }]);
+
+  return Round;
+}();
+
+exports.default = Round;
+
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6911,7 +6863,7 @@ var Stade = function () {
 
 exports.default = Stade;
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6977,8 +6929,8 @@ var Team = function () {
 
 exports.default = Team;
 
-},{}],12:[function(require,module,exports){
-"use strict";
+},{}],11:[function(require,module,exports){
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6998,6 +6950,10 @@ var getRandomInt = exports.getRandomInt = function _getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max) + 1;
   return Math.floor(Math.random() * (max - min)) + min;
+};
+
+var replaceVarFromStr = exports.replaceVarFromStr = function _replaceVarFromStr(str, search, replace) {
+  return str.replace('{{' + search + '}}', replace);
 };
 
 },{}]},{},[4]);
